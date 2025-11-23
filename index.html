@@ -884,19 +884,19 @@
                     <div class="checkbox-group">
                         <div class="checkbox-item">
                             <input type="checkbox" id="trendDispatch" onchange="toggleTrendLine('dispatch')">
-                            <label for="trendDispatch">派車GAI趨勢線</label>
+                            <label for="trendDispatch">【運輸油耗】趨勢線</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="trendOperation" onchange="toggleTrendLine('operation')">
-                            <label for="trendOperation">運務GAI趨勢線</label>
+                            <label for="trendOperation">【電力消耗】趨勢線</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="trendStorage" onchange="toggleTrendLine('storage')">
-                            <label for="trendStorage">託收托運GAI趨勢線</label>
+                            <label for="trendStorage">【廢退食材】趨勢線</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="trendRevenue" onchange="toggleTrendLine('revenue')">
-                            <label for="trendRevenue">營業額趨勢線</label>
+                            <label for="trendRevenue">【營業額】趨勢線</label>
                         </div>
                     </div>
                 </div>
@@ -1334,14 +1334,14 @@ function updateCarbonChart(data) {
             fill: true
         },
         {
-            label: '【電力】',
+            label: '【電力消耗】',
             data: data.operation,
             borderColor: '#10b981',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             borderWidth: 2,
             tension: 0.4,
             yAxisID: 'yLeft',
-            unit: 'k度',
+            unit: 'h度',
             fill: true,
             // 特別處理：如果有負數，使用不同顏色
             segment: {
