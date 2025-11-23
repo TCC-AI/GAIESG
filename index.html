@@ -1593,10 +1593,10 @@ function updateCarbonChart(data) {
 
             const data = dataCache.data;
             const datasets = [
-                { name: '派車GAI', data: data.dispatch, unit: '公噸' },
-                { name: '運務GAI', data: data.operation, unit: '公斤' },
-                { name: '託收托運GAI', data: data.storage, unit: '公斤' },
-                { name: '營業額', data: data.revenue, unit: '元' }
+                { name: '【運輸油耗】', data: data.dispatch, unit: '公噸' },
+                { name: '【電力消耗】', data: data.operation, unit: 'h度' },
+                { name: '【廢退食材】', data: data.storage, unit: '公斤' },
+                { name: '【營業額】', data: data.revenue, unit: '元' }
             ];
 
             // 更新統計卡片
