@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>昶青集團碳排放追蹤系統</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="R0.png">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        /* ===== 全域樣式 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0ea5e9;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ===== 登入頁面 ===== */
+        #loginPage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            display: block;
+            border-radius: 50%;
+            box-shadow: var(--shadow);
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .input-icon .form-input {
+            padding-left: 2.75rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* ===== 主應用程式 ===== */
+        #mainApp {
+            display: none;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .app-header {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .app-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .app-title-group h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .app-title-group p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* ===== 圖表卡片 ===== */
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-selector select,
+        .date-selector input {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .date-selector select:focus,
+        .date-selector input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn-icon {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-refresh {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-refresh:hover {
+            background: #0284c7;
+            transform: translateY(-2px);
+        }
+
+        .btn-stats {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-stats:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-export {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        /* ===== 圖表容器 ===== */
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-skeleton {
+            display: none;
+            height: 400px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 10px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ===== 圖表選項 ===== */
+        .chart-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .option-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .option-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .prediction-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prediction-controls input[type="number"] {
+            width: 80px;
+            padding: 0.375rem 0.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        /* ===== 統計面板 ===== */
+        .stats-panel {
+            display: none;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-card.operation {
+            border-left-color: var(--secondary-color);
+        }
+
+        .stat-card.storage {
+            border-left-color: var(--accent-color);
+        }
+
+        .stat-card.revenue {
+            border-left-color: var(--danger-color);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: var(--secondary-color);
+        }
+
+        .stat-change.negative {
+            color: var(--danger-color);
+        }
+
+        .stats-details {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 10px;
+        }
+
+        .stats-details h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .stats-table th {
+            font-weight: 600;
+            color: var(--text-primary);
+            background: #f8fafc;
+        }
+
+        .stats-table td {
+            color: var(--text-secondary);
+        }
+
+        /* ===== 通知訊息 ===== */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            display: flex;
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .notification-icon {
+            font-size: 1.25rem;
+        }
+
+        .notification.success .notification-icon {
+            color: var(--secondary-color);
+        }
+
+        .notification.error .notification-icon {
+            color: var(--danger-color);
+        }
+
+        .notification.warning .notification-icon {
+            color: var(--accent-color);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-close {
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            transition: color 0.3s ease;
+        }
+
+        .notification-close:hover {
+            color: var(--text-primary);
+        }
+
+        /* ===== 動畫 ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== 響應式設計 ===== */
+        @media (max-width: 768px) {
+            #mainApp {
+                padding: 1rem;
+            }
+
+            .app-header {
+                padding: 1rem;
+            }
+
+            .header-left,
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .chart-card {
+                padding: 1rem;
+            }
+
+            .chart-wrapper {
+                height: 300px;
+            }
+
+            .chart-controls {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .date-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-icon {
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .notification {
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+
+            .login-container {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-title-group h1 {
+                font-size: 1.25rem;
+            }
+
+            .chart-title {
+                font-size: 1rem;
+            }
+
+            .user-info {
+                padding: 0.375rem 0.75rem;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== 登入頁面 ===== -->
+    <div id="loginPage">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="R0.png" alt="昶青集團 Logo" class="login-logo">
+                <h1 class="login-title">昶青集團</h1>
+                <p class="login-subtitle">碳排放追蹤系統</p>
+            </div>
+
+            <div id="loginAlert" class="alert"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <i class="fas fa-user"></i> 帳號
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            class="form-input" 
+                            placeholder="請輸入帳號"
+                            required
+                            autocomplete="username"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fas fa-lock"></i> 密碼
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-input" 
+                            placeholder="請輸入密碼"
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>登入系統</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== 主應用程式 ===== -->
+    <div id="mainApp">
+        <!-- 頁首 -->
+        <header class="app-header">
+            <div class="header-left">
+                <img src="R0.png" alt="Logo" class="app-logo">
+                <div class="app-title-group">
+                    <h1>昶青集團碳排放追蹤系統</h1>
+                    <p>Carbon Emission Tracking System</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">使用者</div>
+                        <div class="user-role" id="userRole">職稱</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> 登出
+                </button>
+            </div>
+        </header>
+
+        <!-- 圖表卡片 -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2 class="chart-title">
+                    <i class="fas fa-chart-line"></i>
+                    碳排追蹤趨勢分析
+                </h2>
+                <div class="chart-controls">
+                    <div class="date-selector">
+                        <select id="carbonDateRange" onchange="handleDateRangeChange()">
+                            <option value="7">近 7 天</option>
+                            <option value="30" selected>近 30 天</option>
+                            <option value="90">近 90 天</option>
+                            <option value="custom">自訂範圍</option>
+                        </select>
+                        <input type="date" id="carbonStartDate" style="display: none;">
+                        <input type="date" id="carbonEndDate" style="display: none;">
+                    </div>
+                    <button class="btn-icon btn-refresh" onclick="refreshCarbonChart()">
+                        <i class="fas fa-sync-alt"></i> 重新整理
+                    </button>
+                    <button class="btn-icon btn-stats" onclick="toggleStats()">
+                        <i class="fas fa-chart-bar"></i> 顯示統計
+                    </button>
+                </div>
+            </div>
+
+            <!-- 圖表載入骨架 -->
+            <div id="carbonChartSkeleton" class="chart-skeleton"></div>
+
+            <!-- 圖表容器 -->
+            <div id="carbonChartContainer" class="chart-wrapper">
+                <canvas id="carbonChart"></canvas>
+            </div>
+
+            <!-- 圖表選項 -->
+            <div class="chart-options">
+                <div class="option-group">
+                    <div class="option-title">
+                        <i class="fas fa-chart-line"></i> 趨勢線
+                    </div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="trendDispatch" onchange="toggleTrendLine('dispatch')">
+                            <label for="trendDispatch">派車GAI趨勢線</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="trendOperation" onchange="toggleTrendLine('operation')">
+                            <label for="trendOperation">運務GAI趨勢線</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="trendStorage" onchange="toggleTrendLine('storage')">
+                            <label for="trendStorage">託收托運GAI趨勢線</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="trendRevenue" onchange="toggleTrendLine('revenue')">
+                            <label for="trendRevenue">營業額趨勢線</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <div class="option-title">
+                        <i class="fas fa-crystal-ball"></i> 預測
+                    </div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="showPrediction" onchange="togglePrediction()">
+                            <label for="showPrediction">顯示預測</label>
+                        </div>
+                        <div class="prediction-controls">
+                            <label for="predictionDays" style="font-size: 0.875rem; color: var(--text-secondary);">預測天數：</label>
+                            <input type="number" id="predictionDays" value="7" min="1" max="30" onchange="updatePrediction()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 統計面板 -->
+            <div id="carbonStats" class="stats-panel">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">派車GAI 總計</div>
+                        <div class="stat-value" id="statDispatchTotal">0</div>
+                        <div class="stat-change" id="statDispatchChange">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>0%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card operation">
+                        <div class="stat-label">運務GAI 總計</div>
+                        <div class="stat-value" id="statOperationTotal">0</div>
+                        <div class="stat-change" id="statOperationChange">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>0%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card storage">
+                        <div class="stat-label">託收托運GAI 總計</div>
+                        <div class="stat-value" id="statStorageTotal">0</div>
+                        <div class="stat-change" id="statStorageChange">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>0%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card revenue">
+                        <div class="stat-label">營業額 總計</div>
+                        <div class="stat-value" id="statRevenueTotal">0</div>
+                        <div class="stat-change" id="statRevenueChange">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-details">
+                    <h4><i class="fas fa-table"></i> 詳細統計</h4>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>項目</th>
+                                <th>平均值</th>
+                                <th>最大值</th>
+                                <th>最小值</th>
+                                <th>標準差</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTableBody">
+                            <!-- 動態填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知訊息 -->
+    <div id="notification" class="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-title" id="notificationTitle">成功</div>
+            <div class="notification-message" id="notificationMessage">操作完成</div>
+        </div>
+        <div class="notification-close" onclick="hideNotification()">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+
+    <script>
+        // ===== 全域變數 =====
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxH_TgCrUVzMh5FprKYpMtgNdsreJ0u9D3QndhCDcPb-q38QqBxSyq6GFixB_WJJv2x/exec'; // 請替換為你的 Apps Script URL
+        const CACHE_DURATION = 30 * 60 * 1000; // 30 分鐘快取
+
+        let carbonChartInstance = null;
+        let carbonChartData = {
+            labels: [],
+            datasets: []
+        };
+        let currentUser = null;
+        let dataCache = {
+            data: null,
+            timestamp: null
+        };
+
+        // ===== 登入功能 =====
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await login();
+        });
+
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const loginBtn = document.getElementById('loginBtn');
+            const loginAlert = document.getElementById('loginAlert');
+
+            if (!username || !password) {
+                showLoginAlert('請輸入帳號和密碼', 'error');
+                return;
+            }
+
+            // 顯示載入狀態
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>登入中...</span>';
+            loginAlert.style.display = 'none';
+
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.user) {
+                    // 登入成功
+                    currentUser = result.user;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    showLoginAlert('登入成功！正在載入系統...', 'success');
+                    
+                    setTimeout(() => {
+                        document.getElementById('loginPage').style.display = 'none';
+                        document.getElementById('mainApp').style.display = 'block';
+                        initMainApp();
+                    }, 1000);
+                } else {
+                    showLoginAlert(result.error || '帳號或密碼錯誤', 'error');
+                }
+            } catch (error) {
+                console.error('登入失敗:', error);
+                showLoginAlert('登入失敗，請檢查網路連線', 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>登入系統</span>';
+            }
+        }
+
+        function showLoginAlert(message, type) {
+            const alert = document.getElementById('loginAlert');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function logout() {
+            if (confirm('確定要登出嗎？')) {
+                localStorage.removeItem('currentUser');
+                dataCache = { data: null, timestamp: null };
+                currentUser = null;
+                
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                
+                showNotification('已登出系統', 'success');
+            }
+        }
+
+        // ===== 初始化主應用程式 =====
+        function initMainApp() {
+            // 設定使用者資訊
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userRole').textContent = `${currentUser.department} - ${currentUser.position}`;
+                document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+            }
+
+            // 初始化圖表
+            initCarbonChart();
+            
+            // 載入資料
+            loadCarbonChartData();
+        }
+
+        // ===== 圖表初始化 =====
+        function initCarbonChart() {
+            const ctx = document.getElementById('carbonChart').getContext('2d');
+            
+            carbonChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: carbonChartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: {
+                                    family: 'Inter, Noto Sans TC',
+                                    size: 13,
+                                    weight: '600'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('zh-TW', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) + ' ' + context.dataset.unit;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter, Noto Sans TC',
+                                    size: 11
+                                }
+                            }
+                        },
+                        yLeft: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '碳排量 (公斤/噸)',
+                                font: {
+                                    family: 'Inter, Noto Sans TC',
+                                    size: 13,
+                                    weight: '600'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter, Noto Sans TC',
+                                    size: 11
+                                }
+                            }
+                        },
+                        yRight: {
+                            type: 'linear',
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '營業額 (元)',
+                                font: {
+                                    family: 'Inter, Noto Sans TC',
+                                    size: 13,
+                                    weight: '600'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter, Noto Sans TC',
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== 載入圖表資料 =====
+        async function loadCarbonChartData(forceRefresh = false) {
+            // 檢查快取
+            if (!forceRefresh && dataCache.data && dataCache.timestamp) {
+                const cacheAge = Date.now() - dataCache.timestamp;
+                if (cacheAge < CACHE_DURATION) {
+                    console.log('使用快取資料');
+                    updateCarbonChart(dataCache.data);
+                    return;
+                }
+            }
+
+            // 取得日期範圍
+            let startDate, endDate;
+            const rangeSelector = document.getElementById('carbonDateRange');
+            
+            if (rangeSelector.value === 'custom') {
+                startDate = document.getElementById('carbonStartDate')?.value;
+                endDate = document.getElementById('carbonEndDate')?.value;
+            } else {
+                const today = new Date();
+                const days = parseInt(rangeSelector.value);
+                const start = new Date(today);
+                start.setDate(today.getDate() - days);
+                
+                startDate = start.toISOString().split('T')[0];
+                endDate = today.toISOString().split('T')[0];
+            }
+
+            if (!startDate || !endDate) {
+                showNotification('請選擇日期範圍', 'warning');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                showNotification('開始日期不能晚於結束日期', 'error');
+                return;
+            }
+
+            // 顯示載入狀態
+            document.getElementById('carbonChartSkeleton').style.display = 'block';
+            document.getElementById('carbonChartContainer').style.display = 'none';
+
+            try {
+                const url = `${GOOGLE_SCRIPT_URL}?action=getCarbonChartData&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    if (result.data.dates && result.data.dates.length > 0) {
+                        // 更新快取
+                        dataCache = {
+                            data: result.data,
+                            timestamp: Date.now()
+                        };
+                        
+                        updateCarbonChart(result.data);
+                        showNotification(`成功載入 ${result.data.dates.length} 筆資料`, 'success');
+                    } else {
+                        throw new Error('查無資料，請調整日期範圍');
+                    }
+                } else {
+                    throw new Error(result.error || 'API 回應格式錯誤');
+                }
+
+            } catch (error) {
+                console.error('載入碳排資料失敗:', error);
+                
+                const container = document.getElementById('carbonChartContainer');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #dc2626;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <h4>載入失敗</h4>
+                        <p>${error.message}</p>
+                        <button class="btn btn-primary" onclick="refreshCarbonChart()" style="margin-top: 1rem;">
+                            <i class="fas fa-sync-alt"></i> 重試
+                        </button>
+                    </div>
+                `;
+                
+                showNotification(`載入失敗: ${error.message}`, 'error');
+
+            } finally {
+                document.getElementById('carbonChartSkeleton').style.display = 'none';
+                document.getElementById('carbonChartContainer').style.display = 'block';
+            }
+        }
+
+        // ===== 更新圖表 =====
+        function updateCarbonChart(data) {
+            carbonChartData.labels = data.dates;
+            carbonChartData.datasets = [
+                {
+                    label: '派車GAI',
+                    data: data.dispatch,
+                    borderColor: '#0ea5e9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    yAxisID: 'yLeft',
+                    unit: '公噸',
+                    fill: true
+                },
+                {
+                    label: '運務GAI',
+                    data: data.operation,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    yAxisID: 'yLeft',
+                    unit: '公斤',
+                    fill: true
+                },
+                {
+                    label: '託收托運GAI',
+                    data: data.storage,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    yAxisID: 'yLeft',
+                    unit: '公斤',
+                    fill: true
+                },
+                {
+                    label: '營業額',
+                    data: data.revenue,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    yAxisID: 'yRight',
+                    unit: '元',
+                    fill: true
+                }
+            ];
+
+            if (carbonChartInstance) {
+                carbonChartInstance.data = carbonChartData;
+                carbonChartInstance.update();
+            }
+        }
+
+        // ===== 日期範圍變更 =====
+        function handleDateRangeChange() {
+            const rangeSelector = document.getElementById('carbonDateRange');
+            const startDateInput = document.getElementById('carbonStartDate');
+            const endDateInput = document.getElementById('carbonEndDate');
+
+            if (rangeSelector.value === 'custom') {
+                startDateInput.style.display = 'block';
+                endDateInput.style.display = 'block';
+                
+                // 設定預設值
+                const today = new Date();
+                const thirtyDaysAgo = new Date(today);
+                thirtyDaysAgo.setDate(today.getDate() - 30);
+                
+                endDateInput.value = today.toISOString().split('T')[0];
+                startDateInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+            } else {
+                startDateInput.style.display = 'none';
+                endDateInput.style.display = 'none';
+                loadCarbonChartData();
+            }
+        }
+
+        // ===== 重新整理 =====
+        function refreshCarbonChart() {
+            dataCache = { data: null, timestamp: null };
+            loadCarbonChartData(true);
+        }
+
+        // ===== 趨勢線切換 =====
+        function toggleTrendLine(type) {
+            const checkbox = document.getElementById(`trend${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            const datasetIndex = {
+                'dispatch': 0,
+                'operation': 1,
+                'storage': 2,
+                'revenue': 3
+            }[type];
+
+            if (checkbox.checked) {
+                const dataset = carbonChartData.datasets[datasetIndex];
+                const trendData = calculateTrendLine(dataset.data);
+                
+                carbonChartData.datasets.push({
+                    label: dataset.label + ' (趨勢)',
+                    data: trendData,
+                    borderColor: dataset.borderColor,
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    tension: 0,
+                    yAxisID: dataset.yAxisID,
+                    unit: dataset.unit,
+                    pointRadius: 0,
+                    fill: false
+                });
+            } else {
+                const trendLabel = carbonChartData.datasets[datasetIndex].label + ' (趨勢)';
+                const trendIndex = carbonChartData.datasets.findIndex(d => d.label === trendLabel);
+                if (trendIndex !== -1) {
+                    carbonChartData.datasets.splice(trendIndex, 1);
+                }
+            }
+
+            carbonChartInstance.update();
+        }
+
+        // ===== 計算趨勢線 =====
+        function calculateTrendLine(data) {
+            const validData = data.filter(v => v !== null && v !== undefined && !isNaN(v));
+            const n = validData.length;
+            
+            if (n < 2) return data.map(() => null);
+            
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            
+            for (let i = 0; i < n; i++) {
+                sumX += i;
+                sumY += validData[i];
+                sumXY += i * validData[i];
+                sumX2 += i * i;
+            }
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            return data.map((_, i) => slope * i + intercept);
+        }
+
+        // ===== 預測功能 =====
+        function togglePrediction() {
+            const checkbox = document.getElementById('showPrediction');
+            if (checkbox.checked) {
+                const days = parseInt(document.getElementById('predictionDays').value || 7);
+                addPredictionToChart(days);
+            } else {
+                removePredictionFromChart();
+            }
+        }
+
+        function updatePrediction() {
+            const checkbox = document.getElementById('showPrediction');
+            if (checkbox.checked) {
+                removePredictionFromChart();
+                const days = parseInt(document.getElementById('predictionDays').value || 7);
+                addPredictionToChart(days);
+            }
+        }
+
+        function addPredictionToChart(days) {
+            const baseDatasets = carbonChartData.datasets.filter(d => !d.label.includes('預測'));
+            
+            baseDatasets.forEach((dataset, index) => {
+                if (index < 4) { // 只對原始四條線做預測
+                    const predictions = predictFutureTrend(dataset.data, days);
+                    const extendedData = [...dataset.data, ...predictions];
+                    
+                    carbonChartData.datasets.push({
+                        label: dataset.label + ' (預測)',
+                        data: extendedData,
+                        borderColor: dataset.borderColor,
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        tension: 0.4,
+                        yAxisID: dataset.yAxisID,
+                        unit: dataset.unit,
+                        pointRadius: 3,
+                        pointStyle: 'circle',
+                        fill: false
+                    });
+                }
+            });
+
+            // 擴展日期標籤
+            const lastDate = new Date(carbonChartData.labels[carbonChartData.labels.length - 1]);
+            const extendedLabels = [...carbonChartData.labels];
+            
+            for (let i = 1; i <= days; i++) {
+                const nextDate = new Date(lastDate);
+                nextDate.setDate(lastDate.getDate() + i);
+                extendedLabels.push(nextDate.toISOString().split('T')[0]);
+            }
+            
+            carbonChartData.labels = extendedLabels;
+            carbonChartInstance.update();
+        }
+
+        function removePredictionFromChart() {
+            carbonChartData.datasets = carbonChartData.datasets.filter(d => !d.label.includes('預測'));
+            
+            // 恢復原始日期標籤
+            if (dataCache.data && dataCache.data.dates) {
+                carbonChartData.labels = dataCache.data.dates;
+            }
+            
+            carbonChartInstance.update();
+        }
+
+        function predictFutureTrend(data, days = 7) {
+            const validData = data.filter(v => v !== null && v !== undefined && !isNaN(v));
+            
+            if (validData.length < 2) return [];
+            
+            const n = validData.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            
+            for (let i = 0; i < n; i++) {
+                sumX += i;
+                sumY += validData[i];
+                sumXY += i * validData[i];
+                sumX2 += i * i;
+            }
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            const predictions = [];
+            const lastIndex = n - 1;
+            
+            for (let i = 1; i <= days; i++) {
+                const predictedValue = slope * (lastIndex + i) + intercept;
+                predictions.push(Math.max(0, predictedValue));
+            }
+            
+            return predictions;
+        }
+
+        // ===== 統計功能 =====
+        function toggleStats() {
+            const statsPanel = document.getElementById('carbonStats');
+            const btn = event.target.closest('.btn-stats');
+            
+            if (statsPanel.style.display === 'none' || !statsPanel.style.display) {
+                statsPanel.style.display = 'block';
+                btn.innerHTML = '<i class="fas fa-chart-bar"></i> 隱藏統計';
+                calculateStatistics();
+            } else {
+                statsPanel.style.display = 'none';
+                btn.innerHTML = '<i class="fas fa-chart-bar"></i> 顯示統計';
+            }
+        }
+
+        function calculateStatistics() {
+            if (!dataCache.data) return;
+
+            const data = dataCache.data;
+            const datasets = [
+                { name: '派車GAI', data: data.dispatch, unit: '公噸' },
+                { name: '運務GAI', data: data.operation, unit: '公斤' },
+                { name: '託收托運GAI', data: data.storage, unit: '公斤' },
+                { name: '營業額', data: data.revenue, unit: '元' }
+            ];
+
+            // 更新統計卡片
+            datasets.forEach((dataset, index) => {
+                const validData = dataset.data.filter(v => v !== null && v !== undefined && !isNaN(v));
+                const total = validData.reduce((sum, val) => sum + val, 0);
+                const avg = total / validData.length;
+                
+                // 計算變化率（與前一期比較）
+                const midPoint = Math.floor(validData.length / 2);
+                const firstHalf = validData.slice(0, midPoint);
+                const secondHalf = validData.slice(midPoint);
+                const firstAvg = firstHalf.reduce((sum, val) => sum + val, 0) / firstHalf.length;
+                const secondAvg = secondHalf.reduce((sum, val) => sum + val, 0) / secondHalf.length;
+                const changePercent = ((secondAvg - firstAvg) / firstAvg * 100).toFixed(1);
+
+                const ids = ['Dispatch', 'Operation', 'Storage', 'Revenue'];
+                const id = ids[index];
+                
+                document.getElementById(`stat${id}Total`).textContent = total.toLocaleString('zh-TW', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + ' ' + dataset.unit;
+
+                const changeElement = document.getElementById(`stat${id}Change`);
+                const isPositive = changePercent >= 0;
+                changeElement.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
+                changeElement.innerHTML = `
+                    <i class="fas fa-arrow-${isPositive ? 'up' : 'down'}"></i>
+                    <span>${Math.abs(changePercent)}%</span>
+                `;
+            });
+
+            // 更新詳細統計表格
+            const tbody = document.getElementById('statsTableBody');
+            tbody.innerHTML = '';
+
+            datasets.forEach(dataset => {
+                const validData = dataset.data.filter(v => v !== null && v !== undefined && !isNaN(v));
+                const total = validData.reduce((sum, val) => sum + val, 0);
+                const avg = total / validData.length;
+                const max = Math.max(...validData);
+                const min = Math.min(...validData);
+                
+                // 計算標準差
+                const variance = validData.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / validData.length;
+                const stdDev = Math.sqrt(variance);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${dataset.name}</strong></td>
+                    <td>${avg.toLocaleString('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${dataset.unit}</td>
+                    <td>${max.toLocaleString('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${dataset.unit}</td>
+                    <td>${min.toLocaleString('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${dataset.unit}</td>
+                    <td>${stdDev.toLocaleString('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${dataset.unit}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ===== 通知功能 =====
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const title = document.getElementById('notificationTitle');
+            const messageEl = document.getElementById('notificationMessage');
+            const icon = notification.querySelector('.notification-icon i');
+
+            notification.className = `notification ${type} show`;
+            
+            const titles = {
+                success: '成功',
+                error: '錯誤',
+                warning: '警告'
+            };
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle'
+            };
+
+            title.textContent = titles[type] || '通知';
+            messageEl.textContent = message;
+            icon.className = `fas ${icons[type] || 'fa-info-circle'}`;
+
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.remove('show');
+        }
+
+        // ===== 頁面載入 =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // 檢查是否有儲存的登入狀態
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    initMainApp();
+                } catch (error) {
+                    console.error('解析使用者資料失敗:', error);
+                    localStorage.removeItem('currentUser');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
