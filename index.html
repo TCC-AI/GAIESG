@@ -992,7 +992,7 @@
 
     <script>
         // ===== 全域變數 =====
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxH_TgCrUVzMh5FprKYpMtgNdsreJ0u9D3QndhCDcPb-q38QqBxSyq6GFixB_WJJv2x/exec'; // 請替換為你的 Apps Script URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwe2kg6RCDCaDpKwbYciRkg5AZlDITOpAqt5OPZEzY6uDInjsTNNBAEg1KcccF5A8MM/exec'; // 請替換為你的 Apps Script URL
         const CACHE_DURATION = 30 * 60 * 1000; // 30 分鐘快取
 
         let carbonChartInstance = null;
@@ -1318,61 +1318,73 @@
             }
         }
 
-        // ===== 更新圖表 =====
-        function updateCarbonChart(data) {
-            carbonChartData.labels = data.dates;
-            carbonChartData.datasets = [
-                {
-                    label: '派車GAI',
-                    data: data.dispatch,
-                    borderColor: '#0ea5e9',
-                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    yAxisID: 'yLeft',
-                    unit: '公噸',
-                    fill: true
+// ===== 更新圖表 (修正版) =====
+function updateCarbonChart(data) {
+    carbonChartData.labels = data.dates;
+    carbonChartData.datasets = [
+        {
+            label: '派車GAI',
+            data: data.dispatch,
+            borderColor: '#0ea5e9',
+            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            yAxisID: 'yLeft',
+            unit: '噸',
+            fill: true
+        },
+        {
+            label: '運務GAI',
+            data: data.operation,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            yAxisID: 'yLeft',
+            unit: '公斤',
+            fill: true,
+            // 特別處理：如果有負數，使用不同顏色
+            segment: {
+                borderColor: ctx => {
+                    const value = ctx.p1.parsed.y;
+                    return value < 0 ? '#ef4444' : '#10b981';
                 },
-                {
-                    label: '運務GAI',
-                    data: data.operation,
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    yAxisID: 'yLeft',
-                    unit: '公斤',
-                    fill: true
-                },
-                {
-                    label: '託收托運GAI',
-                    data: data.storage,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    yAxisID: 'yLeft',
-                    unit: '公斤',
-                    fill: true
-                },
-                {
-                    label: '營業額',
-                    data: data.revenue,
-                    borderColor: '#ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    yAxisID: 'yRight',
-                    unit: '元',
-                    fill: true
+                backgroundColor: ctx => {
+                    const value = ctx.p1.parsed.y;
+                    return value < 0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
                 }
-            ];
-
-            if (carbonChartInstance) {
-                carbonChartInstance.data = carbonChartData;
-                carbonChartInstance.update();
             }
+        },
+        {
+            label: '託收托運GAI',
+            data: data.storage,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            yAxisID: 'yLeft',
+            unit: '公斤',
+            fill: true
+        },
+        {
+            label: '營業額',
+            data: data.revenue,
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            yAxisID: 'yRight',
+            unit: '元',
+            fill: true
         }
+    ];
+
+    if (carbonChartInstance) {
+        carbonChartInstance.data = carbonChartData;
+        carbonChartInstance.update();
+    }
+}
+
 
         // ===== 日期範圍變更 =====
         function handleDateRangeChange() {
