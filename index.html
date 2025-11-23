@@ -924,7 +924,7 @@
                     <div class="checkbox-group">
                         <div class="checkbox-item">
                             <input type="checkbox" id="showPrediction" onchange="togglePrediction()">
-                            <label for="showPrediction">顯示預測</label>
+                            <label for="showPrediction">顯示預測(線性迴歸)</label>
                         </div>
                         <div class="prediction-controls">
                             <label for="predictionDays" style="font-size: 0.875rem; color: var(--text-secondary);">預測天數：</label>
@@ -1367,7 +1367,7 @@ function updateCarbonChart(data) {
                 },
                 backgroundColor: ctx => {
                     const value = ctx.p1.parsed.y;
-                    return value < 0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0)';
+                    return value < 0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
                 }
             }
         },
